@@ -64,7 +64,7 @@ def page_scrapper(presence, page_catcher, required_elements, number_of_vacancies
     vacancies = driver.find_elements_by_css_selector(presence)
     # Iterating over list of vacancies
     for link in vacancies[:number_of_vacancies]:
-        vacancy_content = []
+        vacancy_content = dict()
         try:
             # Waiting for the presence of vacancies
             main_wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, page_catcher)))
@@ -74,16 +74,19 @@ def page_scrapper(presence, page_catcher, required_elements, number_of_vacancies
             # Waiting for required information
             main_wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-qa=\"vacancy-description\"]")))
             # Gather required information
-            vacancy_content.extend(seq(required_elements).map(lambda elem: driver.find_element_by_css_selector(elem).text))
+            # vacancy_content.fromkeys(range(len(css_elements)), seq(required_elements).map(
+            #     lambda elem: driver.find_element_by_css_selector(elem).text))
+            vacancy_content = {el: el for el in seq(required_elements).map(
+                lambda elem: driver.find_element_by_css_selector(elem).text)}
             # Appending collected data from page to DataSet
-            vacancies_df = pd.concat([vacancies_df, pd.Series(vacancy_content)], axis=1)
+            vacancies_df.append(vacancy_content)
 
             driver.close()
             driver.switch_to.window(driver.window_handles[0])
 
         except (NoSuchElementException, StaleElementReferenceException):
-            vacancy_content.append(None) # append() OR extend()?
-            vacancies_df = pd.concat([vacancies_df, pd.Series(vacancy_content)], axis=1)
+            vacancy_content.setdefault("missing")
+            vacancies_df.append(vacancy_content)
             driver.close()
             driver.switch_to.window(driver.window_handles[0])
 
@@ -103,11 +106,11 @@ main_wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.vacancy-se
 # ----------------------------------
 # HH by default determines geolocation and changes vacancies to local ones.
 # We do not need this, therefore, we find the switch responsible for this and turn it off. Then rebooting the page.
-main_wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "span.bloko-icon_cancel"))).click()
-driver.refresh()
+# main_wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "span.bloko-icon_cancel"))).click()
+# driver.refresh()
 # ----------------------------------
 # Creating pandas DataFrame for storing collected data
-vacancies_df = pd.DataFrame()
+vacancies_df = list()
 # Some additional variable for navigation
 num_pages = len(driver.find_elements_by_css_selector("span a.bloko-button"))
 # ----------------------------------
@@ -133,6 +136,7 @@ page_scrapper(css_list_of_vacancies, css_link_to_vacancy, css_elements, scrapper
 print("Scrapping is over. Congratulations!")
 # ----------------------------------
 # To CSV file
-vacancies_df.to_csv(scrapperConfig.path_to_output + '/vacancies_data_test.csv')
+with open(scrapperConfig.path_to_output + '/vacancies_data_test.json', "w") as wf:
+    json.dump(vacancies_df, wf)
 # ----------------------------------
 driver.quit()
