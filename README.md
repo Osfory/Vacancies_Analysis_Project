@@ -1,4 +1,4 @@
-###Data Science project for labor market analysis
+### Data Science project for labor market analysis
 
 The project is designed to extract popular requirements from vacancies in the areas of Data Science, Data Engineering and Data Analysis.
 

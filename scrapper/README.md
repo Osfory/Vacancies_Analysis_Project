@@ -1,4 +1,4 @@
-###Getting started:
+### Getting started:
 
 - Install venv for python project isolation: `python -m venv .`
 - Activate venv for shell: `source bin/activate`
