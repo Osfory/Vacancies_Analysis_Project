@@ -6,3 +6,7 @@ Project components:
 - Scrapper: program for scrapping popular sites with vacancies. Program result - json array. For more information see source code and README.md in /scrapper folder.
 - Rawdata: artifact crafted by scrapper. It represents json array with collected data.
 - Cvproseccor: Jupyter project for processing collected raw data. Project result - processed data and extracting some insights from it.
+
+To start collecting data go to /scrapper folder.
+
+To start data analysis after scrapping go to cvprocessor folder. 
