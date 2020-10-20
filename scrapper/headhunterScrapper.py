@@ -8,8 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import *
 from functional import seq
 from chromium import *
-import pandas as pd
-import csv
+# import pandas as pd
 import json
 
 
@@ -76,8 +75,10 @@ def page_scrapper(presence, page_catcher, required_elements, number_of_vacancies
             # Gather required information
             # vacancy_content.fromkeys(range(len(css_elements)), seq(required_elements).map(
             #     lambda elem: driver.find_element_by_css_selector(elem).text))
-            vacancy_content = {el: el for el in seq(required_elements).map(
-                lambda elem: driver.find_element_by_css_selector(elem).text)}
+            vacancy_content = {elem[0]: elem[1] for elem in zip(required_elements, seq(required_elements).map(
+                lambda elem: driver.find_element_by_css_selector(elem).text))}
+            # vacancy_content = {el: el for el in seq(required_elements).map(
+            #     lambda elem: driver.find_element_by_css_selector(elem).text)}
             # Appending collected data from page to DataSet
             vacancies_df.append(vacancy_content)
 
